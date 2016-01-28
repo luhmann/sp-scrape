@@ -12,6 +12,7 @@
   "dependencies": {
     "download": "^4.4.3",
     "lodash": "^4.0.1",
+    "proxy-agent-patch": "0.0.4",
     "x-ray": "^2.0.3"
   }
 }

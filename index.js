@@ -13,6 +13,8 @@ var scraped;
 console.log(BASE_FOLDER);
 console.log(agent);
 
+// require('proxy-agent-patch')();
+
 x('http://www.jfdietrich.com/portraits', {
     title: '.active-link > a',
     images: x('.thumb', [{
@@ -20,20 +22,25 @@ x('http://www.jfdietrich.com/portraits', {
     }])
 })((err, data)  => {
     'use strict';
+    if (err) {
+      console.error(err);
+      return;
+    }
     scraped = data;
     console.log(err, data);
-    var counter = 1;
     data.images.forEach(function (img, index) {
         let url = `${img.src}${QUALITY_PARAM}`;
-        let prefix = _.padStart(index, 2, '0');
-        let filename = path.basename(img.src);
-        agent.get(url/*, `${BASE_FOLDER}/${data.title}/${prefix}_${filename}`*/);
+        console.log(url);
+        agent.get(url);
     });
 
     agent
         .dest(`${BASE_FOLDER}/${data.title}`)
         .rename(function(path) {
-            // path.basename = prefix + '_' + path.basename;
+          var prefix = _.findIndex(scraped.images, function(item) {
+            return item.src.indexOf(path.basename) > -1;
+          });
+            path.basename = _.padStart(prefix, 2, '0') + '_' + path.basename;
             path.extname = '.jpg';
             console.log(path);
             return path;
